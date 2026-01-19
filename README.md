@@ -1,40 +1,68 @@
 # Secure QR Lens
 
-Система превентивной защиты от Quishing-атак (фишинг через QR-коды).
+Система защиты от фишинга через QR-коды.
 
-@secureqrlensbot - бот для проверки функционала в Telegram.
+@secureqrlens - бот доступен и готов к использованию в Telegram!
+
+В релиз вышло приложение на андроид - Secure Qr Lens! (Пока что не реализована AR-визуализация).
 
 ## Описание
 
-Secure QR Lens анализирует URL из QR-кодов и определяет уровень угрозы:
-- **SAFE** — безопасный URL
-- **DANGER** — фишинговый/вредоносный URL
-- **SUSPICIOUS** — потенциально опасный URL
+Secure QR Lens проверяет URL из QR-кодов и определяет уровень угрозы:
+- SAFE - безопасный URL
+- DANGER - фишинговый/вредоносный URL
+- SUSPICIOUS - подозрительный URL
 
-### Многоэтапный анализ
+## Мобильное приложение
 
-**Этап 0: Раскрытие редиректов**
-- Раскрытие цепочки сокращённых ссылок (bit.ly, clck.ru и др.)
-- Анализ финального URL
+Приложение для Android находится в папке `android_app/`
 
-**Этап 1: Эвристические правила (локальный, <100 мс)**
-- Проверка whitelist СБП
-- Детекция malware-расширений (.apk, .exe)
-- Анализ Deep Link схем (tg://, sber://)
-- Punycode-декодирование (IDN Homograph)
-- Typosquatting (расстояние Левенштейна)
-- Энтропия Шеннона (DGA-домены)
+Запуск:
+```bash
+cd android_app
+flutter pub get
+flutter run
+```
 
-**Этап 2: ML-классификация (~50 мс)**
-- Логистическая регрессия (multi_class='ovr')
-- 6 признаков URL
-- Вероятности для трёх классов
+Сборка APK:
+```bash
+cd android_app
+flutter build apk --release
+```
 
-**Этап 3: Yandex Safe Browsing (опционально)**
-- Проверка через Yandex Safe Browsing API
-- Детекция MALWARE, SOCIAL_ENGINEERING, UNWANTED_SOFTWARE
+Готовый APK: `release/secure-qr-lens-v1.0.0.apk`
 
-## Установка
+## Анализ
+
+### Этап 1: Эвристики
+
+- Whitelist СБП (qr.nspk.ru, sbp-qr.ru)
+- Malware расширения (.apk, .exe, .bat, .cmd, .scr)
+- Deep Link схемы (tg://, sber://, bank://, ton://, whatsapp://, tinkoff://, alfa://, vtb://, sberpay://)
+- Punycode домены (xn--)
+- Typosquatting (расстояние Левенштейна <= 2)
+- Энтропия Шеннона (> 4.5)
+
+### Этап 2: ML классификация
+
+Признаки:
+- Длина URL
+- Количество точек в домене
+- Спецсимволы
+- IP адрес вместо домена
+- Энтропия домена
+- Расстояние до известных брендов
+
+Scoring:
+- 0-1 балл = SAFE
+- 2-3 балла = SUSPICIOUS
+- 4+ баллов = DANGER
+
+### Этап 3: Yandex Safe Browsing (опционально)
+
+Проверка через Yandex Safe Browsing API.
+
+## Установка Python версии
 
 ```bash
 git clone https://github.com/agoldprogcorp/secureqrlens
@@ -44,159 +72,81 @@ pip install -r requirements.txt
 
 ## Использование
 
-### 1. Обучение модели
-
+Обучение модели:
 ```bash
 python models/train_model.py
 ```
 
-### 2. Демонстрация эвристик
-
+Демонстрация эвристик:
 ```bash
 python scripts/demo_heuristics.py
 ```
 
-### 3. Демонстрация ML
-
+Демонстрация ML:
 ```bash
 python scripts/demo_ml.py
 ```
 
-### 4. Полный пайплайн
-
+Полный пайплайн:
 ```bash
 python scripts/demo_full_pipeline.py
 ```
 
-### 5. Тестирование
-
+Тестирование:
 ```bash
 python tests/test_system.py
-python tests/test_redirect_resolver.py
-python tests/test_yandex_sb.py
 ```
 
-## Telegram-бот
+## Telegram бот
 
-Бот позволяет проверять QR-коды прямо в Telegram.
+Настройка:
 
-### Настройка
-
-1. Создайте бота через [@BotFather](https://t.me/BotFather)
-2. Скопируйте токен
-3. Создайте файл `.env` в корне проекта:
-
+1. Создайте бота через @BotFather
+2. Создайте файл `.env`:
 ```
-TELEGRAM_BOT_TOKEN=ваш_токен_бота
-YANDEX_SB_API_KEY=ваш_ключ_yandex  # опционально
+TELEGRAM_BOT_TOKEN=ваш_токен
+YANDEX_SB_API_KEY=ваш_ключ  # опционально
 ```
 
-### Запуск
+Примечание: Yandex Safe Browsing API опционален. Без него система работает только на локальных эвристиках и ML.
 
+Запуск:
 ```bash
 python telegram_bot/bot.py
 ```
 
-### Команды бота
+Команды:
+- /start - приветствие
+- /help - справка
+- /check <url> - проверить URL
 
-- `/start` — приветствие
-- `/help` — справка
-- `/check <url>` — проверить URL
-
-Также можно отправить фото QR-кода — бот декодирует и проанализирует ссылку.
-
-## Yandex Safe Browsing
-
-Для дополнительной проверки URL через Yandex Safe Browsing:
-
-1. Получите API-ключ на https://yandex.com/dev/safebrowsing/
-2. Добавьте в `.env`:
+## Структура
 
 ```
-YANDEX_SB_API_KEY=ваш_ключ
-```
-
-Если ключ не настроен, система работает в оффлайн-режиме (только локальный анализ).
-
-## Структура проекта
-
-```
-secure-qr-lens/
-├── data/
-│   ├── dataset.csv           # Датасет (1000 URL)
-│   ├── whitelist_brands.txt  # 100 легитимных брендов
-│   ├── sbp_whitelist.txt     # Домены СБП
-│   └── test_urls.csv         # Тестовая выборка (40 URL)
-├── models/
-│   ├── train_model.py        # Скрипт обучения
-│   ├── model.pkl             # Обученная модель
-│   └── scaler.pkl            # Нормализатор
-├── modules/
-│   ├── heuristics.py         # Эвристический анализатор
-│   ├── feature_extractor.py  # Извлечение признаков
-│   ├── ml_classifier.py      # ML-классификатор
-│   ├── redirect_resolver.py  # Раскрытие редиректов
-│   └── yandex_safebrowsing.py # Yandex Safe Browsing API
-├── scripts/
-│   ├── demo_heuristics.py    # Демо эвристик
-│   ├── demo_ml.py            # Демо ML
-│   └── demo_full_pipeline.py # Демо полного пайплайна
-├── telegram_bot/
-│   ├── bot.py                # Основной файл бота
-│   ├── handlers.py           # Обработчики команд
-│   ├── config.py             # Конфигурация
-│   └── requirements.txt      # Зависимости бота
-├── tests/
-│   ├── test_system.py        # Тестирование системы
-│   ├── test_redirect_resolver.py # Тесты редиректов
-│   ├── test_yandex_sb.py     # Тесты Yandex SB
-│   └── test_results.csv      # Результаты тестов
-├── .env.example              # Пример переменных окружения
-├── .gitignore
-├── LICENSE
-├── README.md
-└── requirements.txt
+secureqrlens/
+├── data/                   - датасет и whitelist
+├── models/                 - ML модель
+├── modules/                - Python модули
+├── scripts/                - демо скрипты
+├── telegram_bot/           - Telegram бот
+├── tests/                  - тесты
+└── android_app/            - Android приложение
 ```
 
 ## Датасет
 
-1000 URL из открытых источников:
-- **Легитимные (400):** банки, госуслуги, магазины, СБП
-- **Фишинговые (400):** PhishTank, URLhaus, typosquatting, Punycode
-- **Подозрительные (200):** Deep Link, сокращатели URL
+1000 URL:
+- 400 легитимных (банки, госуслуги, магазины)
+- 400 фишинговых (PhishTank, URLhaus, typosquatting)
+- 200 подозрительных (Deep Link, сокращатели)
 
-## Признаки ML-модели
+## Результаты
 
-1. `url_length` — длина URL / 200
-2. `dots_count` — количество точек в домене
-3. `special_chars` — количество спецсимволов
-4. `has_ip` — IP-адрес вместо домена (0/1)
-5. `entropy` — энтропия Шеннона домена
-6. `levenshtein_min` — мин. расстояние до брендов
-
-## Пример работы бота
-
-```
-Пользователь: [отправляет фото QR-кода]
-
-Бот:
-Анализ QR-кода
-
-Извлечённый URL: https://clck.ru/xxx
-
-Цепочка редиректов:
-1. https://clck.ru/xxx
-2. https://sberrbank.ru/login
-
-ВЕРДИКТ: DANGER (опасно)
-
-Причины:
-- Typosquatting: расстояние до sberbank.ru = 1
-
-Yandex Safe Browsing: Проверено, угроз нет
-
-Время анализа: 0.15 сек
-```
+- **Accuracy системы**: 90.0%
+- **Accuracy ML**: 74.7%
+- **Время анализа**: <1 мс (эвристики), ~5 мс (ML)
+- **Размер датасета**: 1000 URL
+- **Тестовая выборка**: 300 URL
 
 ## Лицензия
 

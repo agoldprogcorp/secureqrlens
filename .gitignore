@@ -34,3 +34,7 @@ Thumbs.db
 
 # Kiro
 .kiro/
+
+# Documentation and release (not for git)
+docs/
+release/

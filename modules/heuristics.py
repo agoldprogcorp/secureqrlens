@@ -98,6 +98,11 @@ class HeuristicsAnalyzer:
         return None
 
     def _check_punycode(self, url, domain):
+        # Проверка на кириллицу в домене (без punycode)
+        if re.search(r'[а-яА-ЯёЁ]', domain):
+            return domain
+        
+        # Проверка punycode
         if 'xn--' not in url.lower():
             return None
         if idna is None:
@@ -132,6 +137,11 @@ class HeuristicsAnalyzer:
     def _check_high_entropy(self, domain):
         parts = domain.split('.')
         domain_name = parts[0] if len(parts) > 1 else domain
+        
+        # Игнорируем короткие домены (меньше 5 символов)
+        if len(domain_name) < 5:
+            return None
+            
         entropy = self._calculate_entropy(domain_name)
         if entropy > self.ENTROPY_THRESHOLD:
             return entropy
@@ -141,6 +151,7 @@ class HeuristicsAnalyzer:
         start_time = time.time()
         domain = self._extract_domain(url)
 
+        # 1. Whitelist СБП
         if self._check_sbp_whitelist(domain):
             return {
                 'verdict': 'SAFE',
@@ -148,6 +159,16 @@ class HeuristicsAnalyzer:
                 'time_ms': (time.time() - start_time) * 1000
             }
 
+        # 1.5. Проверка основного whitelist (ПЕРЕД typosquatting!)
+        clean_domain = domain.replace('www.', '')
+        if clean_domain in self.brand_whitelist or domain in self.brand_whitelist:
+            return {
+                'verdict': 'SAFE',
+                'details': f'Домен {domain} в whitelist',
+                'time_ms': (time.time() - start_time) * 1000
+            }
+
+        # 2. Malware расширения
         malware_ext = self._check_malware_extension(url)
         if malware_ext:
             return {
@@ -156,6 +177,7 @@ class HeuristicsAnalyzer:
                 'time_ms': (time.time() - start_time) * 1000
             }
 
+        # 3. Deep Link схемы
         deep_link = self._check_deep_link(url)
         if deep_link:
             return {
@@ -164,6 +186,7 @@ class HeuristicsAnalyzer:
                 'time_ms': (time.time() - start_time) * 1000
             }
 
+        # 4. Punycode / Кириллица
         decoded = self._check_punycode(url, domain)
         if decoded:
             return {
@@ -172,6 +195,7 @@ class HeuristicsAnalyzer:
                 'time_ms': (time.time() - start_time) * 1000
             }
 
+        # 5. Typosquatting (ПОСЛЕ проверки whitelist!)
         typo_dist, closest = self._check_typosquatting(domain)
         if typo_dist is not None:
             return {
@@ -180,6 +204,7 @@ class HeuristicsAnalyzer:
                 'time_ms': (time.time() - start_time) * 1000
             }
 
+        # 6. Высокая энтропия
         entropy = self._check_high_entropy(domain)
         if entropy is not None:
             return {

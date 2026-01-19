@@ -1,0 +1,1067 @@
+# Расширенный whitelist для Secure QR Lens
+# Формат: один домен на строку
+# Включает: основные домены, короткие ссылки, поддомены, CDN
+
+# ==========================================
+# БАНКИ И ФИНАНСЫ
+# ==========================================
+
+# Сбербанк
+sberbank.ru
+sber.ru
+sberbank.com
+online.sberbank.ru
+api.sberbank.ru
+3dsec.sberbank.ru
+securepayments.sberbank.ru
+sbrf.ru
+sbermarket.ru
+sberzvuk.ru
+sberhealth.ru
+sberauto.ru
+sberlogistics.ru
+sbermegamarket.ru
+sberdevices.ru
+sbol.ru
+
+# Тинькофф
+tinkoff.ru
+tinkoff.com
+tinkoffinsurance.ru
+tinkoff-bank.ru
+api.tinkoff.ru
+business.tinkoff.ru
+www.tinkoff.ru
+securepay.tinkoff.ru
+
+# Альфа-Банк
+alfabank.ru
+alfabank.com
+alfa.ru
+alfadirect.ru
+api.alfabank.ru
+click.alfabank.ru
+sense.alfabank.ru
+alfabank.by
+
+# ВТБ
+vtb.ru
+vtb.com
+vtb24.ru
+online.vtb.ru
+api.vtb.ru
+bo.vtb.ru
+vtbcapital.ru
+
+# Газпромбанк
+gazprombank.ru
+gpb.ru
+gpbm.ru
+
+# Райффайзен
+raiffeisen.ru
+raiffeisenbank.ru
+online.raiffeisen.ru
+
+# Росбанк
+rosbank.ru
+rosbank.com
+
+# Россельхозбанк
+rshb.ru
+rshbbank.ru
+online.rshb.ru
+
+# Открытие
+open.ru
+openbank.ru
+open-broker.ru
+
+# МТС Банк
+mtsbank.ru
+mts-bank.ru
+
+# Почта Банк
+pochtabank.ru
+psbank.ru
+
+# Совкомбанк
+sovcombank.ru
+halvacard.ru
+
+# Ренессанс
+rencredit.ru
+renins.ru
+
+# Хоум Кредит
+homecredit.ru
+hcfb.ru
+
+# ОТП Банк
+otpbank.ru
+
+# Уралсиб
+uralsib.ru
+
+# Промсвязьбанк
+psbank.ru
+psbconsulting.ru
+
+# Банк Санкт-Петербург
+bspb.ru
+
+# Ак Барс
+akbars.ru
+
+# Точка
+tochka.com
+tochka.ru
+
+# Модульбанк
+modulbank.ru
+
+# Qiwi
+qiwi.com
+qiwi.ru
+w.qiwi.com
+
+# ЮMoney (ex-Яндекс.Деньги)
+yoomoney.ru
+yamoney.ru
+
+# WebMoney
+webmoney.ru
+wmtransfer.com
+
+# СБП (Система быстрых платежей)
+qr.nspk.ru
+sbp.nspk.ru
+nspk.ru
+mir.ru
+mironline.ru
+
+# ==========================================
+# ГОСУДАРСТВЕННЫЕ СЕРВИСЫ
+# ==========================================
+
+# Госуслуги
+gosuslugi.ru
+esia.gosuslugi.ru
+lk.gosuslugi.ru
+api.gosuslugi.ru
+pos.gosuslugi.ru
+gu-st.ru
+gosuslugi29.ru
+gosuslugi.astrobl.ru
+
+# Налоговая
+nalog.gov.ru
+nalog.ru
+lkfl.nalog.ru
+lkul.nalog.ru
+lkip.nalog.ru
+
+# Пенсионный фонд / СФР
+pfr.gov.ru
+sfr.gov.ru
+es.pfrf.ru
+
+# Правительство
+government.ru
+gov.ru
+kremlin.ru
+
+# Москва
+mos.ru
+my.mos.ru
+ag.mos.ru
+ed.mos.ru
+pgu.mos.ru
+uslugi.mos.ru
+zakupki.mos.ru
+
+# ГИБДД / МВД
+gibdd.ru
+mvd.ru
+гибдд.рф
+
+# Росреестр
+rosreestr.ru
+pkk.rosreestr.ru
+
+# ФМС / МВД
+мвд.рф
+fms.gov.ru
+
+# Роспотребнадзор
+rospotrebnadzor.ru
+
+# ФССП (приставы)
+fssp.gov.ru
+fssprus.ru
+
+# ФНС
+fns.gov.ru
+
+# Минздрав
+minzdrav.gov.ru
+rosminzdrav.ru
+
+# Минобр
+edu.gov.ru
+minobrnauki.gov.ru
+
+# Электронное правительство
+egov.ru
+epgu.gosuslugi.ru
+
+# ==========================================
+# IT-КОМПАНИИ И СЕРВИСЫ
+# ==========================================
+
+# Яндекс
+yandex.ru
+yandex.com
+yandex.by
+yandex.kz
+yango.ru
+api.yandex.ru
+passport.yandex.ru
+mail.yandex.ru
+disk.yandex.ru
+music.yandex.ru
+market.yandex.ru
+eda.yandex.ru
+taxi.yandex.ru
+lavka.yandex.ru
+travel.yandex.ru
+cloud.yandex.ru
+translate.yandex.ru
+maps.yandex.ru
+images.yandex.ru
+news.yandex.ru
+zen.yandex.ru
+dzen.ru
+browser.yandex.ru
+metrika.yandex.ru
+direct.yandex.ru
+money.yandex.ru
+kinopoisk.ru
+auto.ru
+realty.yandex.ru
+rabota.yandex.ru
+health.yandex.ru
+
+# Google
+google.com
+google.ru
+youtube.com
+gmail.com
+drive.google.com
+docs.google.com
+sheets.google.com
+slides.google.com
+forms.google.com
+meet.google.com
+calendar.google.com
+photos.google.com
+maps.google.com
+translate.google.com
+play.google.com
+chrome.google.com
+accounts.google.com
+analytics.google.com
+ads.google.com
+cloud.google.com
+
+# Mail.ru / VK
+mail.ru
+my.mail.ru
+e.mail.ru
+biz.mail.ru
+cloud.mail.ru
+vk.com
+vk.link
+m.vk.com
+api.vk.com
+oauth.vk.com
+vkontakte.ru
+ok.ru
+odnoklassniki.ru
+my.games
+games.mail.ru
+deti.mail.ru
+hi-tech.mail.ru
+news.mail.ru
+sport.mail.ru
+afisha.mail.ru
+auto.mail.ru
+lady.mail.ru
+health.mail.ru
+kino.mail.ru
+hh.ru
+
+# Microsoft
+microsoft.com
+live.com
+outlook.com
+office.com
+office365.com
+onedrive.com
+skype.com
+linkedin.com
+github.com
+azure.com
+bing.com
+msn.com
+xbox.com
+microsoft.ru
+
+# Apple
+apple.com
+icloud.com
+itunes.com
+apps.apple.com
+support.apple.com
+apple.ru
+
+# Meta
+facebook.com
+fb.com
+messenger.com
+instagram.com
+whatsapp.com
+wa.me
+oculus.com
+meta.com
+
+# Telegram
+telegram.org
+tg.dev
+telegra.ph
+telesco.pe
+tx.me
+
+# Другие мессенджеры
+viber.com
+signal.org
+discord.com
+discord.gg
+slack.com
+zoom.us
+zoom.com
+teams.microsoft.com
+webex.com
+
+# ==========================================
+# E-COMMERCE / МАРКЕТПЛЕЙСЫ
+# ==========================================
+
+# Ozon
+ozon.ru
+ozon.com
+api.ozon.ru
+seller.ozon.ru
+docs.ozon.ru
+
+# Wildberries
+wildberries.ru
+wb.ru
+wbx.ru
+seller.wildberries.ru
+
+# AliExpress
+aliexpress.ru
+aliexpress.com
+ali.pub
+s.click.aliexpress.com
+
+# Яндекс.Маркет
+market.yandex.ru
+m.market.yandex.ru
+pokupki.market.yandex.ru
+beru.ru
+
+# СберМаркет / СберМегаМаркет
+sbermarket.ru
+sbermegamarket.ru
+megamarket.ru
+
+# Авито
+avito.ru
+m.avito.ru
+api.avito.ru
+
+# Юла
+youla.ru
+youla.io
+
+# ЦИАН
+cian.ru
+m.cian.ru
+
+# Домклик
+domclick.ru
+ipoteka.domclick.ru
+
+# Lamoda
+lamoda.ru
+lamoda.by
+lamoda.kz
+
+# KazanExpress
+kazanexpress.ru
+
+# ==========================================
+# ЭЛЕКТРОНИКА И ТЕХНИКА
+# ==========================================
+
+# DNS
+dns-shop.ru
+m.dns-shop.ru
+
+# М.Видео
+mvideo.ru
+m.mvideo.ru
+
+# Эльдорадо
+eldorado.ru
+
+# Ситилинк
+citilink.ru
+m.citilink.ru
+
+# re:Store
+restore.ru
+re-store.ru
+
+# Связной
+svyaznoy.ru
+
+# МегаФон ритейл
+shop.megafon.ru
+
+# Samsung
+samsung.com
+samsung.ru
+
+# Xiaomi
+mi.com
+xiaomi.ru
+
+# Huawei
+huawei.ru
+consumer.huawei.com
+
+# ==========================================
+# ПРОДУКТЫ И ДОСТАВКА ЕДЫ
+# ==========================================
+
+# Delivery Club
+delivery-club.ru
+dlvr.cc
+
+# Яндекс.Еда
+eda.yandex.ru
+
+# Самокат
+samokat.ru
+
+# ВкусВилл
+vkusvill.ru
+
+# Лента
+lenta.com
+lenta.ru
+
+# Пятёрочка
+5ka.ru
+x5club.ru
+
+# Магнит
+magnit.ru
+magnitcosmetic.ru
+
+# Перекрёсток
+perekrestok.ru
+vprok.ru
+
+# Азбука Вкуса
+av.ru
+azbukavkusa.ru
+
+# Metro
+metro-cc.ru
+
+# ==========================================
+# ТЕЛЕКОМ И СВЯЗЬ
+# ==========================================
+
+# МТС
+mts.ru
+lk.ssl.mts.ru
+shop.mts.ru
+moskva.mts.ru
+login.mts.ru
+
+# Мегафон
+megafon.ru
+lk.megafon.ru
+moscow.megafon.ru
+shop.megafon.ru
+
+# Билайн
+beeline.ru
+my.beeline.ru
+moskva.beeline.ru
+shop.beeline.ru
+
+# Tele2
+tele2.ru
+my.tele2.ru
+msk.tele2.ru
+
+# Ростелеком
+rt.ru
+rostelecom.ru
+lk.rt.ru
+
+# Дом.ру
+dom.ru
+ertelecom.ru
+
+# ТТК
+ttk.ru
+
+# Yota
+yota.ru
+
+# SberMobile
+sber-mobile.ru
+
+# ==========================================
+# ТРАНСПОРТ И ПУТЕШЕСТВИЯ
+# ==========================================
+
+# РЖД
+rzd.ru
+pass.rzd.ru
+ticket.rzd.ru
+
+# Аэрофлот
+aeroflot.ru
+aeroflot.com
+
+# S7
+s7.ru
+s7airlines.com
+
+# Победа
+pobeda.aero
+
+# Utair
+utair.ru
+
+# Уральские авиалинии
+uralairlines.ru
+
+# Nordwind
+nordwindairlines.ru
+
+# Azur Air
+azurair.ru
+
+# Агрегаторы
+aviasales.ru
+skyscanner.ru
+skyscanner.com
+tutu.ru
+kupibilet.ru
+onetwotrip.com
+anywayanyday.com
+
+# Отели
+booking.com
+book.ru
+ostrovok.ru
+bronevik.com
+101hotels.ru
+trivago.ru
+
+# Airbnb
+airbnb.ru
+airbnb.com
+
+# Такси
+taxi.yandex.ru
+city-mobil.ru
+gett.com
+uber.com
+
+# BlaBlaCar
+blablacar.ru
+
+# Каршеринг
+yandex.ru/drive
+delimobil.ru
+belkacar.ru
+citydrive.ru
+
+# ==========================================
+# РАЗВЛЕЧЕНИЯ И МЕДИА
+# ==========================================
+
+# Кинопоиск
+kinopoisk.ru
+hd.kinopoisk.ru
+
+# IVI
+ivi.ru
+ivi.tv
+
+# Okko
+okko.tv
+
+# Premier
+premier.one
+
+# More.tv
+more.tv
+
+# Wink
+wink.ru
+
+# Кинопоиск HD / Яндекс.Плюс
+plus.yandex.ru
+
+# YouTube
+youtube.com
+m.youtube.com
+music.youtube.com
+studio.youtube.com
+
+# RuTube
+rutube.ru
+
+# Twitch
+twitch.tv
+
+# VK Video
+vk.com/video
+vkvideo.ru
+
+# Spotify
+spotify.com
+open.spotify.com
+
+# Яндекс.Музыка
+music.yandex.ru
+
+# Apple Music
+music.apple.com
+
+# Звук / СберЗвук
+sberzvuk.ru
+zvuk.com
+
+# Литрес
+litres.ru
+
+# ==========================================
+# НОВОСТИ И СМИ
+# ==========================================
+
+# Ведущие СМИ
+rbc.ru
+quote.rbc.ru
+lenta.ru
+ria.ru
+tass.ru
+interfax.ru
+kommersant.ru
+vedomosti.ru
+forbes.ru
+iz.ru
+gazeta.ru
+kp.ru
+mk.ru
+aif.ru
+fontanka.ru
+rg.ru
+novayagazeta.ru
+
+# ТВ каналы
+1tv.ru
+vesti.ru
+russia.tv
+ntv.ru
+ren.tv
+5-tv.ru
+ctc.ru
+tnt-online.ru
+friday.ru
+tv3.ru
+match.tv
+sportbox.ru
+
+# Дзен
+dzen.ru
+zen.yandex.ru
+
+# ==========================================
+# IT-СООБЩЕСТВА И ОБРАЗОВАНИЕ
+# ==========================================
+
+# Habr
+habr.com
+habrahabr.ru
+career.habr.com
+
+# VC
+vc.ru
+
+# Pikabu
+pikabu.ru
+
+# Reddit
+reddit.com
+
+# Stack Overflow
+stackoverflow.com
+stackexchange.com
+
+# GitHub
+github.com
+gist.github.com
+githubusercontent.com
+github.io
+
+# GitLab
+gitlab.com
+
+# Coursera
+coursera.org
+
+# Stepik
+stepik.org
+
+# Нетология
+netology.ru
+
+# Skillbox
+skillbox.ru
+
+# GeekBrains
+geekbrains.ru
+
+# Яндекс.Практикум
+practicum.yandex.ru
+
+# ==========================================
+# РАБОТА И КАРЬЕРА
+# ==========================================
+
+# HeadHunter
+hh.ru
+hh.kz
+headhunter.ru
+career.habr.com
+
+# SuperJob
+superjob.ru
+
+# Работа.ру
+rabota.ru
+
+# Зарплата.ру
+zarplata.ru
+
+# Авито Работа
+avito.ru/rabota
+
+# LinkedIn
+linkedin.com
+
+# ==========================================
+# ЗДОРОВЬЕ И МЕДИЦИНА
+# ==========================================
+
+# СберЗдоровье
+sberhealth.ru
+docplus.ru
+
+# DocDoc
+docdoc.ru
+
+# ПроДокторов
+prodoctorov.ru
+
+# Яндекс.Здоровье
+health.yandex.ru
+
+# Госуслуги Здоровье
+lk.gosuslugi.ru/health
+
+# EMC
+emcmos.ru
+
+# Медси
+medsi.ru
+
+# ==========================================
+# ОБЛАЧНЫЕ СЕРВИСЫ И ХОСТИНГ
+# ==========================================
+
+# Yandex Cloud
+cloud.yandex.ru
+console.cloud.yandex.ru
+
+# VK Cloud
+cloud.vk.com
+mcs.mail.ru
+
+# SberCloud
+cloud.sber.ru
+
+# AWS
+aws.amazon.com
+amazonaws.com
+
+# Google Cloud
+cloud.google.com
+storage.googleapis.com
+
+# Azure
+azure.com
+azure.microsoft.com
+
+# Хостинги
+reg.ru
+nic.ru
+ru-center.ru
+timeweb.ru
+beget.ru
+hostinger.ru
+spaceweb.ru
+jino.ru
+
+# ==========================================
+# КРИПТОВАЛЮТЫ И ФИНТЕХ (ЛЕГИТИМНЫЕ)
+# ==========================================
+
+# Binance
+binance.com
+binance.ru
+
+# ByBit
+bybit.com
+
+# Garantex
+garantex.io
+
+# Exmo
+exmo.com
+exmo.me
+
+# ==========================================
+# СТРАХОВАНИЕ
+# ==========================================
+
+# Тинькофф Страхование
+tinkoffinsurance.ru
+
+# СОГАЗ
+sogaz.ru
+
+# Ингосстрах
+ingos.ru
+
+# РЕСО
+reso.ru
+
+# Альфастрахование
+alfastrah.ru
+
+# ВСК
+vsk.ru
+
+# Росгосстрах
+rgs.ru
+
+# Сбербанк Страхование
+sberbank-insurance.ru
+
+# ==========================================
+# АВТО
+# ==========================================
+
+# Auto.ru
+auto.ru
+
+# Дром
+drom.ru
+
+# Авито Авто
+avito.ru/avtomobili
+
+# CarPrice
+carprice.ru
+
+# ==========================================
+# ИГРЫ
+# ==========================================
+
+# Steam
+store.steampowered.com
+steamcommunity.com
+
+# Epic Games
+epicgames.com
+store.epicgames.com
+
+# VK Play / My.Games
+my.games
+vkplay.ru
+
+# PlayStation
+playstation.com
+store.playstation.com
+
+# Xbox
+xbox.com
+microsoft.com/xbox
+
+# ==========================================
+# БЕЗОПАСНОСТЬ
+# ==========================================
+
+# Kaspersky
+kaspersky.ru
+kaspersky.com
+my.kaspersky.com
+
+# Dr.Web
+drweb.ru
+drweb.com
+
+# ESET NOD32
+esetnod32.ru
+eset.com
+
+# Positive Technologies
+ptsecurity.com
+
+# ==========================================
+# CDN И ТЕХНИЧЕСКАЯ ИНФРАСТРУКТУРА
+# ==========================================
+
+# Cloudflare
+cloudflare.com
+cdnjs.cloudflare.com
+
+# Akamai
+akamai.com
+
+# CDN
+cdn.jsdelivr.net
+unpkg.com
+fastly.net
+
+# Google APIs
+googleapis.com
+googleusercontent.com
+gstatic.com
+
+# Facebook CDN
+fbcdn.net
+
+# VK CDN
+vk.me
+userapi.com
+
+# Yandex CDN
+yastatic.net
+
+# ==========================================
+# ОБРАЗОВАТЕЛЬНЫЕ УЧРЕЖДЕНИЯ
+# ==========================================
+
+# МГУ
+msu.ru
+
+# МФТИ
+mipt.ru
+
+# ВШЭ
+hse.ru
+
+# МГТУ им. Баумана
+bmstu.ru
+
+# ИТМО
+itmo.ru
+
+# СПбГУ
+spbu.ru
+
+# ==========================================
+# ДОПОЛНИТЕЛЬНЫЕ ДОМЕНЫ
+# ==========================================
+
+# Почта России
+pochta.ru
+tracking.pochta.ru
+
+# СДЭК
+cdek.ru
+
+# Boxberry
+boxberry.ru
+
+# DPD
+dpd.ru
+
+# ПЭК
+pecom.ru
+
+# Деловые линии
+dellin.ru
+
+# ==========================================
+# МЕЖДУНАРОДНЫЕ (ПОПУЛЯРНЫЕ В РФ)
+# ==========================================
+
+# Amazon
+amazon.com
+amazon.ru
+
+# eBay
+ebay.com
+
+# PayPal
+paypal.com
+
+# Netflix
+netflix.com
+
+# Twitter/X
+twitter.com
+x.com
+
+# Pinterest
+pinterest.com
+
+# TikTok
+tiktok.com
+vm.tiktok.com
+
+# Snapchat
+snapchat.com
+
+# Wikipedia
+wikipedia.org
+ru.wikipedia.org
+
+# Archive
+archive.org
+web.archive.org

@@ -51,14 +51,21 @@ def analyze_url(url):
         'time_sec': 0
     }
     
+    # Раскрытие редиректов для коротких ссылок
+    url_to_analyze = url
     if url.startswith(('http://', 'https://')) and is_shortened_url(url):
         redirect_result = resolve_redirects(url)
         result['redirect_chain'] = redirect_result['chain']
         result['final_url'] = redirect_result['final_url']
+        
         if redirect_result['error']:
-            result['reasons'].append(f"Ошибка редиректов: {redirect_result['error']}")
-    
-    url_to_analyze = result['final_url']
+            # Если не удалось раскрыть - помечаем как подозрительное
+            result['verdict'] = 'SUSPICIOUS'
+            result['reasons'].append(f"Короткая ссылка - не удалось раскрыть редирект: {redirect_result['error']}")
+            result['time_sec'] = time.time() - start_time
+            return result
+        
+        url_to_analyze = redirect_result['final_url']
     
     heur_result = heuristics.analyze(url_to_analyze)
     
@@ -84,13 +91,8 @@ def analyze_url(url):
 
 def format_response(result):
     """Форматирует ответ для пользователя."""
-    lines = ["Анализ QR-кода\n"]
-    lines.append(f"Извлечённый URL: {result['original_url']}")
-    
-    if len(result['redirect_chain']) > 1:
-        lines.append("\nЦепочка редиректов:")
-        for i, url in enumerate(result['redirect_chain'], 1):
-            lines.append(f"{i}. {url}")
+    lines = []
+    lines.append(f"URL: {result['original_url']}")
     
     verdict = result['verdict']
     if verdict == 'SAFE':
@@ -214,11 +216,17 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик текстовых сообщений."""
-    text = update.message.text
+    text = update.message.text.strip()
     
-    if text.startswith(('http://', 'https://', 'tg://', 'sber://')):
-        await update.message.reply_text("Анализирую URL...")
+    # Проверяем, что это URL (начинается с протокола или содержит домен)
+    if text.startswith(('http://', 'https://', 'tg://', 'sber://', 'bank://', 'ton://', 'whatsapp://', 'tinkoff://', 'alfa://', 'vtb://', 'sberpay://')):
         result = analyze_url(text)
+        response = format_response(result)
+        await update.message.reply_text(response)
+    elif '.' in text and not ' ' in text:
+        # Возможно URL без протокола
+        url = 'https://' + text if not text.startswith(('http://', 'https://')) else text
+        result = analyze_url(url)
         response = format_response(result)
         await update.message.reply_text(response)
     else:

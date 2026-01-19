@@ -102,9 +102,13 @@ def is_shortened_url(url):
     Проверяет, является ли URL сокращённой ссылкой.
     """
     shorteners = [
-        'bit.ly', 'clck.ru', 'goo.gl', 't.co', 'tinyurl.com',
-        'is.gd', 'buff.ly', 'ow.ly', 'short.link', 'cutt.ly',
-        'rb.gy', 'vk.cc', 't.me', 'ya.cc'
+        # Российские
+        'clck.ru', 'vk.cc', 'vk.me', 'ok.me', 't.me', 'ya.ru', 'go.mail.ru',
+        # Международные
+        'bit.ly', 'bitly.com', 'goo.gl', 'g.co', 't.co', 'ow.ly', 
+        'tinyurl.com', 'is.gd', 'v.gd', 'rebrand.ly', 'short.io', 'cutt.ly',
+        # Корпоративные
+        'aka.ms', 'amzn.to', 'youtu.be', 'fb.me', 'instagr.am', 'lnkd.in', 'redd.it'
     ]
     try:
         domain = urlparse(url).netloc.lower()
