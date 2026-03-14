@@ -1,39 +1,11 @@
 import 'package:http/http.dart' as http;
 
 class RedirectResolver {
-  // Список популярных сокращателей ссылок
   static const List<String> shorteners = [
-    // Российские
-    'clck.ru',
-    'vk.cc',
-    'vk.me',
-    'ok.me',
-    't.me',
-    'ya.ru',
-    'go.mail.ru',
-    
-    // Международные
-    'bit.ly',
-    'bitly.com',
-    'goo.gl',
-    'g.co',
-    't.co',
-    'ow.ly',
-    'tinyurl.com',
-    'is.gd',
-    'v.gd',
-    'rebrand.ly',
-    'short.io',
-    'cutt.ly',
-    
-    // Корпоративные
-    'aka.ms',
-    'amzn.to',
-    'youtu.be',
-    'fb.me',
-    'instagr.am',
-    'lnkd.in',
-    'redd.it',
+    'clck.ru', 'vk.cc', 'vk.me', 'ok.me', 'ya.ru', 'go.mail.ru',
+    'bit.ly', 'bitly.com', 'goo.gl', 'g.co', 't.co', 'ow.ly',
+    'tinyurl.com', 'is.gd', 'v.gd', 'rebrand.ly', 'short.io', 'cutt.ly',
+    'aka.ms', 'amzn.to', 'youtu.be', 'fb.me', 'instagr.am', 'lnkd.in', 'redd.it',
   ];
 
   static bool isShortenedUrl(String url) {
@@ -57,7 +29,6 @@ class RedirectResolver {
     String? error;
 
     for (int depth = 0; depth < maxDepth; depth++) {
-      // Проверка на циклический редирект
       if (visited.contains(currentUrl)) {
         error = 'Циклический редирект';
         break;
@@ -66,28 +37,19 @@ class RedirectResolver {
 
       try {
         final uri = Uri.parse(currentUrl);
-        
-        // Проверяем только http/https
-        if (!uri.scheme.startsWith('http')) {
-          break;
-        }
+        if (!uri.scheme.startsWith('http')) break;
 
-        // HEAD запрос для получения редиректа (не следуем автоматически)
         final request = http.Request('HEAD', uri);
         request.headers['User-Agent'] = 'SecureQRLens/1.0';
         request.followRedirects = false;
-        
+
         final streamedResponse = await request.send().timeout(timeout);
         final response = await http.Response.fromStream(streamedResponse);
 
-        // Проверяем статус редиректа
         if (response.statusCode >= 300 && response.statusCode < 400) {
           final location = response.headers['location'];
-          if (location == null || location.isEmpty) {
-            break;
-          }
+          if (location == null || location.isEmpty) break;
 
-          // Обработка относительных URL
           String nextUrl;
           if (location.startsWith('http://') || location.startsWith('https://')) {
             nextUrl = location;
@@ -100,7 +62,6 @@ class RedirectResolver {
           chain.add(nextUrl);
           currentUrl = nextUrl;
         } else {
-          // Не редирект - завершаем
           break;
         }
       } catch (e) {
@@ -109,17 +70,13 @@ class RedirectResolver {
         } else if (e.toString().contains('SocketException')) {
           error = 'Нет подключения к интернету';
         } else {
-          error = 'Ошибка сети: ${e.toString()}';
+          error = 'Ошибка сети';
         }
         break;
       }
     }
 
-    return RedirectResult(
-      chain: chain,
-      finalUrl: chain.last,
-      error: error,
-    );
+    return RedirectResult(chain: chain, finalUrl: chain.last, error: error);
   }
 }
 
@@ -128,11 +85,7 @@ class RedirectResult {
   final String finalUrl;
   final String? error;
 
-  RedirectResult({
-    required this.chain,
-    required this.finalUrl,
-    this.error,
-  });
+  RedirectResult({required this.chain, required this.finalUrl, this.error});
 
   bool get hasRedirects => chain.length > 1;
   bool get hasError => error != null;

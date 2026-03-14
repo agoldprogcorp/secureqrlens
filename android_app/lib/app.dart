@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
-import 'features/about/about_screen.dart';
 import 'features/history/history_provider.dart';
 import 'features/history/history_screen.dart';
 import 'features/scanner/scanner_controller.dart';
@@ -29,7 +28,6 @@ class SecureQRLensApp extends StatelessWidget {
         home: const ScannerScreen(),
         routes: {
           '/history': (context) => const HistoryScreen(),
-          '/about': (context) => const AboutScreen(),
         },
       ),
     );

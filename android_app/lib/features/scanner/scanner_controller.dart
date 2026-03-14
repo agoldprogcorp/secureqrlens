@@ -3,42 +3,110 @@ import '../../models/scan_result.dart';
 import '../../models/verdict.dart';
 import '../../core/utils/redirect_resolver.dart';
 import '../analysis/heuristic_analyzer.dart';
-import '../analysis/score_analyzer.dart';
+import '../analysis/ml_analyzer.dart';
+import '../analysis/content_classifier.dart';
 import '../history/history_provider.dart';
 
 class ScannerController extends ChangeNotifier {
   final HeuristicAnalyzer _heuristicAnalyzer = HeuristicAnalyzer();
-  final ScoreAnalyzer _scoreAnalyzer = ScoreAnalyzer();
   final HistoryProvider _historyProvider;
 
   ScannerController(this._historyProvider);
 
-  Future<ScanResult> analyzeUrl(String url) async {
+  Future<ScanResult> analyzeUrl(String raw) async {
     final startTime = DateTime.now();
+    final classification = ContentClassifier.classify(raw);
 
-    debugPrint('Analyzing URL: $url');
+    if (classification.type == ContentType.wifi) {
+      final wifiParams = ContentClassifier.parseWifi(raw);
+      final authType = (wifiParams['T'] ?? '').toUpperCase();
+      final ssid = wifiParams['S'] ?? 'Неизвестная сеть';
+      final hidden = wifiParams['H'] == 'true';
 
-    // Раскрытие редиректов для сокращённых ссылок
-    String urlToAnalyze = url;
-    List<String> redirectChain = [url];
-    
-    if (RedirectResolver.isShortenedUrl(url)) {
-      debugPrint('Shortened URL detected, resolving redirects...');
+      Verdict wifiVerdict;
+      String wifiDetails;
+      List<String> wifiReasons;
+
+      if (authType.isEmpty || authType == 'NOPASS' || authType == '' || authType == 'OPEN') {
+        wifiVerdict = Verdict.danger;
+        wifiDetails = 'Открытая Wi-Fi сеть "$ssid" — без пароля!';
+        wifiReasons = [
+          'Wi-Fi без шифрования',
+          'Трафик может быть перехвачен',
+          'Возможна атака Man-in-the-Middle',
+        ];
+      } else if (authType == 'WEP') {
+        wifiVerdict = Verdict.suspicious;
+        wifiDetails = 'Wi-Fi "$ssid": устаревшее шифрование WEP';
+        wifiReasons = ['WEP взламывается за минуты', 'Рекомендуется WPA2/WPA3'];
+      } else {
+        wifiVerdict = Verdict.safe;
+        wifiDetails = 'Wi-Fi "$ssid" защищена ($authType)';
+        wifiReasons = [
+          'Шифрование: $authType',
+          if (hidden) 'Скрытая сеть',
+        ];
+      }
+
+      final result = ScanResult(
+        url: raw,
+        verdict: wifiVerdict,
+        details: wifiDetails,
+        reasons: wifiReasons,
+        timestamp: DateTime.now(),
+        analysisTimeMs: DateTime.now().difference(startTime).inMilliseconds,
+      );
+      await _historyProvider.addScan(result);
+      return result;
+    }
+
+    if (classification.type == ContentType.nonUrl) {
+      final result = ScanResult(
+        url: raw,
+        verdict: Verdict.unknown,
+        details: '${classification.typeLabel}: содержимое отображено без анализа безопасности',
+        reasons: ['Тип: ${classification.typeLabel}', 'Не является URL'],
+        timestamp: DateTime.now(),
+        analysisTimeMs: DateTime.now().difference(startTime).inMilliseconds,
+      );
+      await _historyProvider.addScan(result);
+      return result;
+    }
+
+    if (classification.type == ContentType.deepLink) {
+      final result = ScanResult(
+        url: raw,
+        verdict: Verdict.suspicious,
+        details: 'Deep Link обходит браузер и выполняет действие напрямую',
+        reasons: [
+          'Deep Link: ${classification.deepLinkScheme}',
+          'Минует браузерную защиту',
+        ],
+        timestamp: DateTime.now(),
+        analysisTimeMs: DateTime.now().difference(startTime).inMilliseconds,
+      );
+      await _historyProvider.addScan(result);
+      return result;
+    }
+
+    String urlToAnalyze = raw;
+    List<String> redirectChain = [raw];
+
+    if (classification.type == ContentType.shortUrl) {
       try {
-        final redirectResult = await RedirectResolver.resolveRedirects(url);
+        final redirectResult = await RedirectResolver.resolveRedirects(raw);
         if (!redirectResult.hasError && redirectResult.hasRedirects) {
           urlToAnalyze = redirectResult.finalUrl;
           redirectChain = redirectResult.chain;
-          debugPrint('Resolved to: $urlToAnalyze');
-          debugPrint('Redirect chain: ${redirectChain.join(' -> ')}');
         } else if (redirectResult.hasError) {
-          debugPrint('Redirect resolution error: ${redirectResult.error}');
-          // Если не удалось раскрыть - помечаем как подозрительное
           final result = ScanResult(
-            url: url,
+            url: raw,
             verdict: Verdict.suspicious,
-            details: 'Короткая ссылка - не удалось раскрыть редирект: ${redirectResult.error}',
-            reasons: ['Короткая ссылка', 'Ошибка раскрытия: ${redirectResult.error}'],
+            details: 'Не удалось раскрыть сокращённую ссылку',
+            reasons: [
+              'Сокращённая ссылка (${classification.typeLabel})',
+              'Ошибка: ${redirectResult.error}',
+            ],
             timestamp: DateTime.now(),
             analysisTimeMs: DateTime.now().difference(startTime).inMilliseconds,
           );
@@ -46,13 +114,11 @@ class ScannerController extends ChangeNotifier {
           return result;
         }
       } catch (e) {
-        debugPrint('Failed to resolve redirects: $e');
-        // Если ошибка - помечаем как подозрительное
         final result = ScanResult(
-          url: url,
+          url: raw,
           verdict: Verdict.suspicious,
-          details: 'Короткая ссылка - не удалось раскрыть редирект',
-          reasons: ['Короткая ссылка', 'Ошибка раскрытия редиректа'],
+          details: 'Не удалось раскрыть сокращённую ссылку',
+          reasons: ['Сокращённая ссылка', 'Ошибка сети'],
           timestamp: DateTime.now(),
           analysisTimeMs: DateTime.now().difference(startTime).inMilliseconds,
         );
@@ -62,36 +128,34 @@ class ScannerController extends ChangeNotifier {
     }
 
     final heuristicResult = _heuristicAnalyzer.analyze(urlToAnalyze);
-    debugPrint('Heuristic verdict: ${heuristicResult.verdict}');
-    debugPrint('Heuristic details: ${heuristicResult.details}');
 
     Verdict finalVerdict;
     String finalDetails;
-    List<String> allReasons = [];
+    List<String> allReasons;
 
     if (heuristicResult.verdict != Verdict.unknown) {
       finalVerdict = heuristicResult.verdict;
       finalDetails = heuristicResult.details;
       allReasons = heuristicResult.reasons;
     } else {
-      final scoreResult = _scoreAnalyzer.analyze(urlToAnalyze);
-      debugPrint('ML Score verdict: ${scoreResult.verdict}');
-      debugPrint('ML Score: ${scoreResult.score}');
-      finalVerdict = scoreResult.verdict;
-      finalDetails = scoreResult.details;
-      allReasons = scoreResult.reasons;
+      final mlResult = MlAnalyzer.analyze(urlToAnalyze);
+      finalVerdict = mlResult.verdict;
+      finalDetails = mlResult.details;
+      allReasons = mlResult.probabilities.entries
+          .map((e) => '${e.key}: ${(e.value * 100).round()}%')
+          .toList();
     }
 
-    // Добавляем информацию о редиректах
     if (redirectChain.length > 1) {
       allReasons.insert(0, 'Редиректов: ${redirectChain.length - 1}');
     }
 
-    final endTime = DateTime.now();
-    final analysisTime = endTime.difference(startTime).inMilliseconds;
+    final analysisTime = DateTime.now().difference(startTime).inMilliseconds;
 
     final result = ScanResult(
-      url: redirectChain.length > 1 ? '${redirectChain.first} → ${redirectChain.last}' : url,
+      url: redirectChain.length > 1
+          ? '${redirectChain.first} → ${redirectChain.last}'
+          : raw,
       verdict: finalVerdict,
       details: finalDetails,
       reasons: allReasons,
@@ -100,7 +164,6 @@ class ScannerController extends ChangeNotifier {
     );
 
     await _historyProvider.addScan(result);
-
     return result;
   }
 }
