@@ -16,15 +16,12 @@ class ScannerOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasVerdict = verdict != null && verdict != Verdict.unknown;
-    if (!hasVerdict) return const SizedBox.shrink();
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return CustomPaint(
           size: Size(constraints.maxWidth, constraints.maxHeight),
           painter: _OverlayPainter(
-            verdict: verdict!,
+            verdict: verdict,
             qrCorners: qrCorners,
             imageSize: imageSize,
             widgetSize: Size(constraints.maxWidth, constraints.maxHeight),
@@ -36,7 +33,7 @@ class ScannerOverlay extends StatelessWidget {
 }
 
 class _OverlayPainter extends CustomPainter {
-  final Verdict verdict;
+  final Verdict? verdict;
   final List<Offset> qrCorners;
   final Size imageSize;
   final Size widgetSize;
@@ -48,6 +45,8 @@ class _OverlayPainter extends CustomPainter {
     required this.widgetSize,
   });
 
+  bool get _hasVerdict => verdict != null && verdict != Verdict.unknown;
+
   Color get _color {
     switch (verdict) {
       case Verdict.safe:
@@ -57,11 +56,11 @@ class _OverlayPainter extends CustomPainter {
       case Verdict.danger:
         return const Color(0xFFF44336);
       default:
-        return Colors.transparent;
+        return const Color(0xFF90CAF9);
     }
   }
 
-  Offset _transform(Offset point) {
+  Offset _transformCorner(Offset point) {
     if (imageSize == Size.zero) return point;
     final scaleX = widgetSize.width / imageSize.width;
     final scaleY = widgetSize.height / imageSize.height;
@@ -71,55 +70,114 @@ class _OverlayPainter extends CustomPainter {
     return Offset(point.dx * scale + offsetX, point.dy * scale + offsetY);
   }
 
+  Rect _viewfinderRect() {
+    final side = min(widgetSize.width, widgetSize.height) * 0.62;
+    final cx = widgetSize.width / 2;
+    final cy = widgetSize.height / 2 - 30;
+    return Rect.fromCenter(center: Offset(cx, cy), width: side, height: side);
+  }
+
+  void _drawCornerBrackets(Canvas canvas, List<Offset> pts, Paint paint,
+      double cornerLen) {
+    for (int i = 0; i < 4; i++) {
+      final curr = pts[i];
+      final next = pts[(i + 1) % 4];
+      final prev = pts[(i + 3) % 4];
+      final dn = _norm(next, curr, cornerLen);
+      final dp = _norm(prev, curr, cornerLen);
+      canvas.drawLine(curr, Offset(curr.dx + dn.dx, curr.dy + dn.dy), paint);
+      canvas.drawLine(curr, Offset(curr.dx + dp.dx, curr.dy + dp.dy), paint);
+    }
+  }
+
+  void _drawRectBrackets(Canvas canvas, Rect rect, Paint paint,
+      double cornerLen) {
+    final pts = [
+      rect.topLeft,
+      rect.topRight,
+      rect.bottomRight,
+      rect.bottomLeft,
+    ];
+    _drawCornerBrackets(canvas, pts, paint, cornerLen);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    final hasCorners = qrCorners.length == 4 && imageSize != Size.zero;
+    final hasCornersData = qrCorners.length == 4 && imageSize != Size.zero;
 
-    if (hasCorners) {
-      final pts = qrCorners.map(_transform).toList();
+    if (hasCornersData && _hasVerdict) {
+      // --- Mode A: precise polygon around detected QR code ---
+      final pts = qrCorners.map(_transformCorner).toList();
       final path = Path()..moveTo(pts[0].dx, pts[0].dy);
       for (int i = 1; i < pts.length; i++) {
         path.lineTo(pts[i].dx, pts[i].dy);
       }
       path.close();
 
-      canvas.drawPath(path, Paint()..color = _color.withValues(alpha: 0.25));
+      canvas.drawPath(
+        path,
+        Paint()..color = _color.withValues(alpha: 0.22),
+      );
       canvas.drawPath(
         path,
         Paint()
           ..color = _color
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 5
+          ..strokeWidth = 4
           ..strokeJoin = StrokeJoin.round,
       );
 
-      const cornerLen = 20.0;
-      final cp = Paint()
-        ..color = _color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 8
-        ..strokeCap = StrokeCap.round;
-
-      for (int i = 0; i < 4; i++) {
-        final curr = pts[i];
-        final next = pts[(i + 1) % 4];
-        final prev = pts[(i + 3) % 4];
-        final dn = _norm(next, curr, cornerLen);
-        final dp = _norm(prev, curr, cornerLen);
-        canvas.drawLine(curr, Offset(curr.dx + dn.dx, curr.dy + dn.dy), cp);
-        canvas.drawLine(curr, Offset(curr.dx + dp.dx, curr.dy + dp.dy), cp);
-      }
-    } else {
-      canvas.drawRect(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..color = _color.withValues(alpha: 0.15),
-      );
-      canvas.drawRect(
-        Rect.fromLTWH(3, 3, size.width - 6, size.height - 6),
+      _drawCornerBrackets(
+        canvas,
+        pts,
         Paint()
-          ..color = _color.withValues(alpha: 0.7)
-          ..strokeWidth = 6
-          ..style = PaintingStyle.stroke,
+          ..color = _color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 7
+          ..strokeCap = StrokeCap.round,
+        22.0,
+      );
+    } else {
+      // --- Mode B: centered viewfinder square (works on all devices) ---
+      final rect = _viewfinderRect();
+
+      // Dim the area outside the viewfinder
+      final outer = Path()
+        ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+      final inner = Path()..addRect(rect);
+      final mask = Path.combine(PathOperation.difference, outer, inner);
+      canvas.drawPath(
+        mask,
+        Paint()..color = Colors.black.withValues(alpha: 0.45),
+      );
+
+      if (_hasVerdict) {
+        // Colored fill inside viewfinder
+        canvas.drawRect(
+          rect,
+          Paint()..color = _color.withValues(alpha: 0.20),
+        );
+        // Solid colored border
+        canvas.drawRect(
+          rect,
+          Paint()
+            ..color = _color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 3,
+        );
+      }
+
+      // Corner brackets (always visible — color depends on verdict)
+      final bracketColor = _hasVerdict ? _color : Colors.white;
+      _drawRectBrackets(
+        canvas,
+        rect,
+        Paint()
+          ..color = bracketColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _hasVerdict ? 7 : 5
+          ..strokeCap = StrokeCap.round,
+        28.0,
       );
     }
   }

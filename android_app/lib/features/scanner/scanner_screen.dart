@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -62,6 +63,51 @@ class _ScannerScreenState extends State<ScannerScreen> {
         _imageSize = Size.zero;
       });
 
+  Future<void> _analyzeFromGallery() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    setState(() => _isProcessing = true);
+
+    final capture = await _cameraController.analyzeImage(image.path);
+    if (!mounted) return;
+
+    if (capture == null || capture.barcodes.isEmpty) {
+      setState(() => _isProcessing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('QR-код на изображении не найден'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
+    final code = capture.barcodes.first.rawValue;
+    if (code == null || code.isEmpty) {
+      setState(() => _isProcessing = false);
+      return;
+    }
+
+    setState(() {
+      _qrCorners = capture.barcodes.first.corners;
+      _imageSize = capture.size;
+    });
+
+    final scannerController = context.read<ScannerController>();
+    final result = await scannerController.analyzeUrl(code);
+
+    if (mounted) {
+      setState(() {
+        _isProcessing = false;
+        _lastResult = result;
+      });
+    }
+  }
+
   Future<void> _openUrl(String url) async {
     final actualUrl = url.contains(' → ') ? url.split(' → ').last : url;
     final uri = Uri.tryParse(actualUrl);
@@ -79,6 +125,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
       appBar: AppBar(
         title: Text(kProMode ? 'Secure QR Lens PRO' : 'Secure QR Lens'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.photo_library_outlined),
+            tooltip: 'Выбрать из галереи',
+            onPressed: _isProcessing ? null : _analyzeFromGallery,
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => Navigator.pushNamed(context, '/history'),
