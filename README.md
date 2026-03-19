@@ -63,14 +63,13 @@ LogisticRegression, 3 класса (safe/danger/suspicious), 6 признако�
 | Техника | ID | Детекция |
 |---|---|---|
 | Quishing | T1660 | Весь пайплайн |
+| Deep Link Intent-диспетчеризация | T1406 | content_classifier.dart |
 | Spearphishing Link | T1566.002 | Эвристики + ML |
+| Defense Evasion (URL-сокращатели) | T1027 | redirect_resolver.dart |
 | IDN Homograph | T1036.008 | Punycode-декодирование |
 | DGA Domains | T1568.002 | Энтропия Шеннона |
-| Typosquatting | T1583.001 | Расстояние Левенштейна |
 | Malware Delivery | T1105 | Расширения файлов |
-| Deep Link Injection | T1528 | Детекция URI-схем |
 | QRLJacking | T1539 | Параметры сессии в URL |
-| Defense Evasion | TA0030 | Раскрытие редиректов |
 
 ## Исследовательская часть (Python)
 
@@ -118,7 +117,7 @@ secureqrlens/
 | Датасет | 3336 URL |
 | Whitelist | 1768 доменов |
 | Эвристик | 9 |
-| MITRE ATT&CK | 9 техник |
+| MITRE ATT&CK | 8 техник |
 
 ## Лицензия
 
