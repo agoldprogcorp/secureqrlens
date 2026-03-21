@@ -47,20 +47,27 @@ class AnalysisScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            if (result.verdict == Verdict.suspicious)
+            if (result.verdict != Verdict.danger) ...[
               ElevatedButton.icon(
                 onPressed: () async {
-                  final uri = Uri.parse(result.url);
-                  if (await canLaunchUrl(uri)) {
+                  final url = result.url.contains(' → ')
+                      ? result.url.split(' → ').last
+                      : result.url;
+                  final uri = Uri.tryParse(url);
+                  if (uri != null && await canLaunchUrl(uri)) {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                   }
                 },
                 icon: const Icon(Icons.open_in_browser),
-                label: const Text('Всё равно перейти'),
+                label: Text(result.verdict == Verdict.suspicious
+                    ? 'Открыть всё равно'
+                    : 'Открыть'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 48),
                 ),
               ),
+              const SizedBox(height: 12),
+            ],
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () {

@@ -126,21 +126,21 @@ class HistoryScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           FilterChip(
-            label: const Text('SAFE'),
+            label: const Text('Безопасно'),
             selected: provider.filterVerdict == Verdict.safe,
             onSelected: (_) => provider.setFilter(Verdict.safe),
             backgroundColor: AppTheme.safe.withValues(alpha: 0.2),
           ),
           const SizedBox(width: 8),
           FilterChip(
-            label: const Text('SUSPICIOUS'),
+            label: const Text('Подозрительно'),
             selected: provider.filterVerdict == Verdict.suspicious,
             onSelected: (_) => provider.setFilter(Verdict.suspicious),
             backgroundColor: AppTheme.suspicious.withValues(alpha: 0.2),
           ),
           const SizedBox(width: 8),
           FilterChip(
-            label: const Text('DANGER'),
+            label: const Text('Опасно'),
             selected: provider.filterVerdict == Verdict.danger,
             onSelected: (_) => provider.setFilter(Verdict.danger),
             backgroundColor: AppTheme.danger.withValues(alpha: 0.2),
@@ -202,13 +202,13 @@ class HistoryScreen extends StatelessWidget {
   String _getVerdictLabel(Verdict verdict) {
     switch (verdict) {
       case Verdict.safe:
-        return 'SAFE';
+        return 'Безопасно';
       case Verdict.danger:
-        return 'DANGER';
+        return 'Опасно';
       case Verdict.suspicious:
-        return 'SUSPICIOUS';
+        return 'Подозрит.';
       default:
-        return 'UNKNOWN';
+        return 'Не-URL';
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,8 +21,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final MobileScannerController _cameraController = MobileScannerController();
   bool _isProcessing = false;
   ScanResult? _lastResult;
-  List<Offset> _qrCorners = const [];
-  Size _imageSize = Size.zero;
 
   @override
   void dispose() {
@@ -40,65 +37,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
     final code = barcodes.first.rawValue;
     if (code == null || code.isEmpty) return;
 
-    setState(() {
-      _isProcessing = true;
-      _qrCorners = barcodes.first.corners;
-      _imageSize = capture.size;
-    });
-
-    final scannerController = context.read<ScannerController>();
-    final result = await scannerController.analyzeUrl(code);
-
-    if (mounted) {
-      setState(() {
-        _isProcessing = false;
-        _lastResult = result;
-      });
-    }
-  }
-
-  void _dismiss() => setState(() {
-        _lastResult = null;
-        _qrCorners = const [];
-        _imageSize = Size.zero;
-      });
-
-  Future<void> _analyzeFromGallery() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return;
-
     setState(() => _isProcessing = true);
 
-    final capture = await _cameraController.analyzeImage(image.path);
-    if (!mounted) return;
-
-    if (capture == null || capture.barcodes.isEmpty) {
-      setState(() => _isProcessing = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('QR-код на изображении не найден'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-      return;
-    }
-
-    final code = capture.barcodes.first.rawValue;
-    if (code == null || code.isEmpty) {
-      setState(() => _isProcessing = false);
-      return;
-    }
-
-    setState(() {
-      _qrCorners = capture.barcodes.first.corners;
-      _imageSize = capture.size;
-    });
-
-    final scannerController = context.read<ScannerController>();
-    final result = await scannerController.analyzeUrl(code);
+    final result = await context.read<ScannerController>().analyzeUrl(code);
 
     if (mounted) {
       setState(() {
@@ -107,6 +48,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
       });
     }
   }
+
+  void _dismiss() => setState(() => _lastResult = null);
 
   Future<void> _openUrl(String url) async {
     final actualUrl = url.contains(' → ') ? url.split(' → ').last : url;
@@ -126,11 +69,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
         title: Text(kProMode ? 'Secure QR Lens PRO' : 'Secure QR Lens'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.photo_library_outlined),
-            tooltip: 'Выбрать из галереи',
-            onPressed: _isProcessing ? null : _analyzeFromGallery,
-          ),
-          IconButton(
             icon: const Icon(Icons.history),
             onPressed: () => Navigator.pushNamed(context, '/history'),
           ),
@@ -143,11 +81,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
             onDetect: _onDetect,
           ),
           Positioned.fill(
-            child: ScannerOverlay(
-              verdict: result?.verdict,
-              qrCorners: _qrCorners,
-              imageSize: _imageSize,
-            ),
+            child: ScannerOverlay(verdict: result?.verdict),
           ),
           Positioned(
             bottom: 0,
@@ -223,16 +157,22 @@ class _ResultPanel extends StatelessWidget {
       case Verdict.suspicious:
         return 'Подозрительно';
       default:
-        return 'Не URL';
+        return 'Не-URL';
     }
   }
 
   bool get _canOpen {
-    if (result.verdict != Verdict.safe) return false;
+    if (result.verdict == Verdict.danger) return false;
     final url =
         result.url.contains(' → ') ? result.url.split(' → ').last : result.url;
-    return url.startsWith('http://') || url.startsWith('https://');
+    return url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        url.startsWith('tg://') ||
+        url.startsWith('sber://');
   }
+
+  String get _openLabel =>
+      result.verdict == Verdict.suspicious ? 'Открыть всё равно' : 'Открыть';
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +193,7 @@ class _ResultPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Verdict header (без крестика)
           Row(
             children: [
               Icon(_icon, color: Colors.white, size: 28),
@@ -265,38 +206,21 @@ class _ResultPanel extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white70),
-                onPressed: onDismiss,
-              ),
             ],
           ),
           const SizedBox(height: 8),
+          // URL
           Text(
             result.url,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white60, fontSize: 13),
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
           ),
           const SizedBox(height: 16),
+          // Кнопки: Open + Scan Again
           Row(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: onDetails,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white54),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: const Text(
-                    'Подробнее',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
               if (_canOpen) ...[
-                const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => onOpenUrl(result.url),
@@ -305,11 +229,41 @@ class _ResultPanel extends StatelessWidget {
                       foregroundColor: _bgColor,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Перейти'),
+                    child: Text(_openLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
+                const SizedBox(width: 10),
               ],
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onDismiss,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white54),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text(
+                    'Сканировать ещё',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
             ],
+          ),
+          const SizedBox(height: 8),
+          // Details button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: onDetails,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.white30),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+              child: const Text(
+                'Подробнее',
+                style: TextStyle(color: Colors.white60, fontSize: 13),
+              ),
+            ),
           ),
         ],
       ),
@@ -347,7 +301,7 @@ class _HintBar extends StatelessWidget {
               const SizedBox(width: 12),
             ],
             Text(
-              isProcessing ? 'Анализируем...' : 'Наведите камеру на QR-код',
+              isProcessing ? 'Анализирую...' : 'Наведите камеру на QR-код',
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],

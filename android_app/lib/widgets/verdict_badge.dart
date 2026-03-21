@@ -41,13 +41,13 @@ class VerdictBadge extends StatelessWidget {
   String _getLabel() {
     switch (verdict) {
       case Verdict.safe:
-        return 'SAFE';
+        return 'БЕЗОПАСНО';
       case Verdict.danger:
-        return 'DANGER';
+        return 'ОПАСНО';
       case Verdict.suspicious:
-        return 'SUSPICIOUS';
+        return 'ПОДОЗРИТЕЛЬНО';
       default:
-        return 'UNKNOWN';
+        return 'НЕ-URL';
     }
   }
 

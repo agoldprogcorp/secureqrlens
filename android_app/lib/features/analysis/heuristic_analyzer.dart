@@ -52,7 +52,7 @@ class HeuristicAnalyzer {
         return HeuristicResult(
           verdict: Verdict.danger,
           details: 'Обнаружено опасное расширение: $ext',
-          reasons: ['Malware расширение: $ext', 'MITRE ATT&CK T1105'],
+          reasons: ['Ссылка ведёт на загрузку файла: $ext'],
         );
       }
     }
@@ -68,7 +68,7 @@ class HeuristicAnalyzer {
             details: 'IDN Homograph Attack: $domain → $decoded',
             reasons: [
               'Кириллица + латиница в одном домене',
-              'MITRE ATT&CK T1036.008',
+              'Домен маскируется под известный сайт',
             ],
           );
         }
@@ -78,7 +78,6 @@ class HeuristicAnalyzer {
             details: 'Punycode-подмена: $domain → $decoded',
             reasons: [
               'Домен маскируется под легитимный',
-              'MITRE ATT&CK T1036.008',
             ],
           );
         }
@@ -92,7 +91,7 @@ class HeuristicAnalyzer {
           details: 'IDN Homograph Attack: смешанные скрипты в домене $domain',
           reasons: [
             'Кириллица + латиница в одном домене',
-            'MITRE ATT&CK T1036.008',
+            'Домен маскируется под известный сайт',
           ],
         );
       }
@@ -108,7 +107,10 @@ class HeuristicAnalyzer {
         return HeuristicResult(
           verdict: Verdict.suspicious,
           details: 'Deep Link: $scheme',
-          reasons: ['Deep Link: $scheme', 'MITRE ATT&CK T1528'],
+          reasons: [
+            'Ссылка минует браузер и открывает приложение напрямую',
+            'Невозможно проверить содержимое без контекста приложения',
+          ],
         );
       }
     }
@@ -118,7 +120,7 @@ class HeuristicAnalyzer {
         return HeuristicResult(
           verdict: Verdict.safe,
           details: 'Домен $domain в whitelist',
-          reasons: ['Whitelist: $brand'],
+          reasons: ['Известный доверенный домен: $brand'],
         );
       }
     }
@@ -134,7 +136,6 @@ class HeuristicAnalyzer {
         reasons: [
           'Параметры сессии/токена в URL',
           'Возможен перехват сессии',
-          'MITRE ATT&CK T1539',
         ],
       );
     }
@@ -144,7 +145,7 @@ class HeuristicAnalyzer {
       return HeuristicResult(
         verdict: Verdict.suspicious,
         details: 'Подозрительная вложенность поддоменов: $dotCount уровней',
-        reasons: ['Subdomain abuse: $dotCount уровней'],
+        reasons: ['Слишком много уровней поддоменов: $dotCount'],
       );
     }
 
@@ -174,8 +175,8 @@ class HeuristicAnalyzer {
         verdict: Verdict.danger,
         details: 'Typosquatting: расстояние $minDistance до $closestBrand',
         reasons: [
-          'Typosquatting: похож на $closestBrand',
-          'MITRE ATT&CK T1583.001',
+          'Домен очень похож на известный сайт: $closestBrand',
+          'Отличается на $minDistance символ(а)',
         ],
       );
     }
@@ -188,8 +189,8 @@ class HeuristicAnalyzer {
           verdict: Verdict.suspicious,
           details: 'Высокая энтропия домена: ${entropy.toStringAsFixed(2)}',
           reasons: [
-            'DGA-домен: энтропия ${entropy.toStringAsFixed(2)}',
-            'MITRE ATT&CK T1568.002',
+            'Случайно сгенерированный домен',
+            'Энтропия ${entropy.toStringAsFixed(2)} бит/символ (норма: до 3.2)',
           ],
         );
       }
